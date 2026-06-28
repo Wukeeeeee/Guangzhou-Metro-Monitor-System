@@ -1,0 +1,25 @@
+# Cesium Ion Access Token (DO NOT COMMIT)
+apikey.txt
+
+# Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Raw GIS data (Shapefiles - large binary files, not needed for web app)
+*.shp
+*.shx
+*.dbf
+*.prj
+*.sbn
+*.sbx
+*.cpg
+*.shp.xml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Unused assets
+light.png

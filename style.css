@@ -1,0 +1,91 @@
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background-color: #0F172A;
+    color: #d4e4fa;
+    font-family: '微软雅黑', system-ui, sans-serif;
+}
+
+.frosted-panel {
+    background: rgba(30, 41, 59, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(123, 208, 255, 0.2);
+    border-radius: 4px;
+}
+
+.digital-font {
+    font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+}
+
+.headline-font {
+    font-family: 'Noto Sans SC', '微软雅黑', system-ui, sans-serif;
+    font-weight: 700;
+}
+
+.glow-text {
+    text-shadow: 0 0 10px rgba(123, 208, 255, 0.5);
+}
+
+#cesiumcontainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.map-wrapper {
+    position: relative;
+    border: 1px solid rgba(123, 208, 255, 0.3);
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+
+.cesium-viewer .cesium-widget-credits {
+    display: none !important;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+::-webkit-scrollbar-thumb { background: rgba(123, 208, 255, 0.3); border-radius: 10px; }
+
+.glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 100, 0.2); }
+    50% { box-shadow: 0 0 30px rgba(0, 255, 100, 0.6); }
+}
+
+.abnormal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 9999;
+}
+body.abnormal-alert .abnormal-overlay {
+    display: block;
+    border: 6px solid red;
+    box-shadow: inset 0 0 200px rgba(255,0,0,0.3);
+    animation: red-alert 0.8s ease-in-out infinite;
+}
+@keyframes red-alert {
+    0%, 100% { border-color: rgba(255,0,0,0.2); box-shadow: inset 0 0 80px rgba(255,0,0,0.1); }
+    50% { border-color: rgba(255,0,0,0.7); box-shadow: inset 0 0 200px rgba(255,0,0,0.35); }
+}
+
+#detail-fields { display: none; }
+body.show-detail #detail-fields { display: block; }
+body.show-detail #d-empty { display: none; }

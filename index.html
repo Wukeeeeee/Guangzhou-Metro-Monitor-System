@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>广州地铁综合监控系统 </title>
+
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.137/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.137/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        @font-face {
+            font-family: 'JetBrains Mono';
+            src: local('Consolas'), local('Courier New'), local('monospace');
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#122131",
+                        "on-secondary-container": "#00374d",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-lowest": "#010f1f",
+                        "on-surface": "#d4e4fa",
+                        "surface-container-high": "#1c2b3c",
+                        "primary": "#b4c5ff",
+                        "surface": "#051424",
+                        "on-primary-container": "#eeefff",
+                        "secondary": "#7bd0ff",
+                        "outline-variant": "#434655",
+                        "on-primary": "#002a78",
+                        "primary-container": "#2563eb",
+                        "tertiary": "#ffb95f",
+                        "error": "#ffb4ab",
+                        "on-secondary": "#00354a",
+                        "surface-container-highest": "#273647",
+                        "inverse-primary": "#0053db",
+                        "secondary-container": "#00a6e0",
+                        "on-surface-variant": "#c3c6d7",
+                        "outline": "#8d90a0",
+                        "inverse-on-surface": "#233143",
+                        "surface-container-low": "#0d1c2d",
+                        "surface-dim": "#051424",
+                        "surface-bright": "#2c3a4c",
+                        "background": "#051424",
+                        "error-container": "#93000a",
+                    },
+                    fontFamily: {
+                        "data-mono-sm": ["Consolas", "Courier New", "monospace"],
+                        "headline-md": ["微软雅黑", "system-ui", "sans-serif"],
+                        "data-mono-lg": ["Consolas", "Courier New", "monospace"],
+                        "label-caps": ["system-ui", "sans-serif"],
+                        "display-lg": ["system-ui", "sans-serif"],
+                        "body-lg": ["system-ui", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="./js/PolylineTrailLinkMaterialProperty.js"></script>
+</head>
+<body class="p-5 flex flex-col gap-6" style="height:100vh;">
+    <div class="abnormal-overlay"></div>
+
+    <header class="w-full h-[60px] flex justify-between items-center px-10 frosted-panel shrink-0">
+        <div class="flex items-center gap-4">
+            <span class="text-secondary" style="font-size:20px;">时间</span>
+            <div class="digital-font text-secondary tracking-widest" id="local-time">--</div>
+        </div>
+        <div class="headline-font text-primary tracking-[0.2em] glow-text text-lg">
+            广州地铁1号线综合监控系统
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="digital-font text-secondary tracking-widest" id="operation-status">停止运营</div>
+            <span class="text-secondary" style="font-size:20px;">运营状态</span>
+        </div>
+    </header>
+
+    <main class="flex-1 grid grid-cols-12 grid-rows-6 gap-6 overflow-hidden" style="min-height:0;">
+
+        <aside class="col-span-3 row-span-6 flex flex-col gap-6 overflow-hidden">
+
+            <section class="frosted-panel flex flex-col shrink-0">
+                <div class="p-4 border-b border-secondary/20 flex justify-between items-center bg-surface-container-high/40 shrink-0">
+                    <h3 class="headline-font text-on-surface text-sm">实时站点客流排行</h3>
+                    <span class="text-[10px] text-secondary/60 digital-font">UNITS: PPH</span>
+                </div>
+                <div class="p-4 space-y-3" id="station-ranking">
+                </div>
+            </section>
+
+            <section class="flex-1 frosted-panel flex flex-col overflow-hidden min-h-0">
+                <div class="p-4 border-b border-secondary/20 flex justify-between items-center bg-surface-container-high/40 shrink-0">
+                    <h3 class="headline-font text-on-surface text-sm">系统问题告警</h3>
+                    <span class="text-[10px] text-red-400 digital-font" id="alarm-count">0</span>
+                </div>
+                <div class="flex-1 p-4 space-y-2 overflow-y-auto scrollbar-thin min-h-0" id="alarm-list">
+                </div>
+            </section>
+        </aside>
+
+        <div class="col-span-6 row-span-6 flex flex-col gap-6 overflow-hidden">
+
+            <section class="flex-1 map-wrapper rounded-sm relative" style="min-height:0;">
+                <div id="cesiumcontainer"></div>
+            </section>
+
+            <section class="h-[100px] grid grid-cols-3 gap-6 shrink-0">
+                <div class="frosted-panel flex items-center justify-center p-4 gap-4">
+                    <div class="flex flex-col">
+                        <span class="text-xs text-secondary/80 headline-font">准点率</span>
+                        <div class="flex items-baseline gap-1">
+                            <span class="digital-font text-4xl text-primary font-bold" id="on-time-rate">99.8</span>
+                            <span class="digital-font text-lg text-primary">%</span>
+                        </div>
+                    </div>
+                    <div class="w-1/3 h-1 bg-surface-container-highest rounded-full overflow-hidden self-center">
+                        <div class="h-full bg-primary w-[99.8%] shadow-[0_0_8px_#b4c5ff]" id="on-time-bar"></div>
+                    </div>
+                </div>
+                <div class="frosted-panel flex items-center justify-center p-4 gap-4 bg-surface-container-lowest/60 border border-primary/30 shadow-[0_0_20px_rgba(180,197,255,0.1)]">
+                    <div class="w-3 h-3 rounded-full bg-primary animate-pulse shadow-[0_0_15px_#b4c5ff]"></div>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-secondary/80 headline-font">系统状态</span>
+                        <span class="digital-font text-3xl text-primary font-bold tracking-[0.1em] glow-text" id="system-status">NORMAL</span>
+                    </div>
+                </div>
+                <div class="frosted-panel flex items-center justify-center p-4 gap-4">
+                    <div class="flex flex-col">
+                        <span class="text-xs text-secondary/80 headline-font">在线列车</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="digital-font text-4xl text-secondary font-bold" id="online-trains">482</span>
+                        </div>
+                    </div>
+                    <span class="text-secondary/40 digital-font" style="font-size:16px;"></span>
+                </div>
+            </section>
+        </div>
+
+        <aside class="col-span-3 row-span-6 flex flex-col gap-6 overflow-hidden">
+
+            <section class="h-[270px] frosted-panel flex flex-col shrink-0 overflow-hidden">
+                <div class="p-4 border-b border-secondary/20 bg-surface-container-high/40 shrink-0">
+                    <h3 class="headline-font text-on-surface text-sm" id="detail-title">站点详情</h3>
+                </div>
+                <div class="flex-1 p-4" id="detail-content">
+                    <div class="space-y-3" id="detail-fields">
+                        <div class="flex justify-between items-center border-b border-outline-variant/20 pb-2">
+                            <span class="text-on-surface-variant text-sm">站名</span>
+                            <span class="digital-font text-secondary font-bold" id="d-name">—</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-outline-variant/20 pb-2">
+                            <span class="text-on-surface-variant text-sm">换乘</span>
+                            <span class="digital-font text-secondary text-sm" id="d-transfers">—</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-outline-variant/20 pb-2">
+                            <span class="text-on-surface-variant text-sm">换乘站</span>
+                            <span class="digital-font text-sm" id="d-isTransfer">—</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-outline-variant/20 pb-2">
+                            <span class="text-on-surface-variant text-sm">客流量</span>
+                            <span class="digital-font text-tertiary font-bold" id="d-flow">—</span>
+                        </div>
+                    </div>
+                    <div class="text-on-surface-variant text-sm text-center mt-8" id="d-empty">
+                        点击地图上的站点查看详细信息
+                    </div>
+                </div>
+            </section>
+
+            <section class="flex-1 frosted-panel flex flex-col overflow-hidden">
+                <div class="p-4 border-b border-secondary/20 flex justify-between items-center bg-surface-container-high/40 shrink-0">
+                    <h3 class="headline-font text-on-surface text-sm">1号线运行状态</h3>
+                </div>
+                <div class="flex-1 p-4 overflow-y-auto" id="line-status">
+                </div>
+            </section>
+        </aside>
+    </main>
+
+    <script type="module">
+        const res = await fetch('apikey.txt');
+        Cesium.Ion.defaultAccessToken = (await res.text()).trim();
+
+        const viewer = new Cesium.Viewer('cesiumcontainer', {
+            animation: false,
+            timeline: false,
+            homeButton: false,
+            geocoder: false,
+            selectionIndicator: false,
+            infoBox: false,
+            navigationHelpButton: false,
+            sceneModePicker: false,
+            fullscreenButton: false,
+        });
+
+        viewer._cesiumWidget._creditContainer.style.display = 'none';
+
+        viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
+        viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(113.28, 23.05, 13000),
+            orientation: {
+                heading: Cesium.Math.toRadians(0),
+                pitch: Cesium.Math.toRadians(-60),
+            },
+            duration: 0.01,
+        });
+
+        const lineres = await fetch("./GZLine1/GZLine1.geojson");
+        const lineresult = await lineres.json();
+        delete lineresult.crs;
+        const line = await Cesium.GeoJsonDataSource.load(lineresult, {
+            stroke: Cesium.Color.fromCssColorString('#F3D03E'),
+            strokeWidth: 10,
+            clampToGround: true,
+            zIndex: 2,
+        });
+        viewer.dataSources.add(line);
+
+        const trailMaterial = new PolylineTrailLinkMaterialProperty(
+            Cesium.Color.fromCssColorString('#F3D03E'),
+            120
+        );
+        const lineEntities = line.entities.values;
+        for (let i = 0; i < lineEntities.length; i++) {
+            let entity = lineEntities[i];
+            if (entity.polyline) {
+                entity.polyline.width = 10;
+                entity.polyline.material = trailMaterial;
+            }
+        }
+
+const stationres = await fetch("./GZLine1/GZLine1_Station.geojson");
+        const stationresult = await stationres.json();
+        delete stationresult.crs;
+
+        const stationsDataRes = await fetch('./data/stations.json');
+        const stationsData = await stationsDataRes.json();
+
+        function addStationPoint(res) {
+            for (let station of res.geometries) {
+
+                const stationInfo = stationsData.stations.find(s => s.name === station.name);
+
+                const pos = Cesium.Cartesian3.fromDegrees(station.coordinates[0], station.coordinates[1]);
+                const entity = viewer.entities.add({
+                    name: 'station',
+                    position: pos,
+                    billboard: {
+                        image: './GZmetro.jpg',
+                        width: 20,
+                        height: 20,
+                        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+                    },
+                    label: {
+                        text: station.name,
+                        font: '16px 微软雅黑, sans-serif',
+                        fillColor: Cesium.Color.WHITE,
+                        outlineColor: Cesium.Color.BLACK,
+                        outlineWidth: 2,
+                        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                        pixelOffset: new Cesium.Cartesian2(0, -30),
+                    },
+                });
+
+                entity.stationData = stationInfo;
+
+            }
+        }
+        addStationPoint(stationresult);
+
+        const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+        handler.setInputAction((click) => {
+            const pickedObject = viewer.scene.pick(click.position);
+
+            if (Cesium.defined(pickedObject) && Cesium.defined(pickedObject.id)) {
+                const entity = pickedObject.id;
+
+                if (entity.name === 'station' && entity.stationData) {
+                    const data = entity.stationData;
+
+                    document.body.classList.add('show-detail');
+
+                    document.getElementById('detail-title').textContent = data.name;
+                    document.getElementById('d-name').textContent = data.name;
+                    document.getElementById('d-transfers').textContent = data.transfers;
+                    document.getElementById('d-isTransfer').textContent = data.isTransfer === 'yes' ? '是' : '否';
+                    document.getElementById('d-flow').textContent = data.flow.toLocaleString() + ' 人';
+
+                    highlightStation(entity);
+                }
+            }
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+        let selectedEntity = null;
+        function highlightStation(entity) {
+
+            if (selectedEntity) {
+                selectedEntity.billboard.color = Cesium.Color.WHITE;
+                selectedEntity.billboard.scale = 1.0;
+            }
+
+            selectedEntity = entity;
+            if (entity && entity.billboard) {
+                entity.billboard.color = Cesium.Color.YELLOW;
+                entity.billboard.scale = 1.5;
+            }
+        }
+
+    </script>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('local-time').textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        const time = new Date();
+        if (time.getHours() >= 6 && time.getHours() <= 24) {
+            let isOperating = true;
+            document.getElementById('operation-status').textContent = '运营中';
+        } else {
+            let isOperating = false;
+            document.getElementById('operation-status').textContent = '停止运营';
+            document.getElementById('operation-status').style.color = 'red';
+        }
+    </script>
+
+    <script>
+        fetch('./data/stations.json').then(res => res.json()).then(json => {
+            const stationNames = json.stations.map(s => s.name);
+
+            function fillStationRanking() {
+            const container = document.getElementById('station-ranking');
+            if (!container) return;
+
+            const data = stationNames.map(name => ({
+                name,
+                count: json.stations.find(s => s.name === name).flow
+            })).sort((a, b) => b.count - a.count);
+
+            container.innerHTML = data.map((s, i) => `
+                <div class="flex items-center justify-between border-b border-outline-variant/30 pb-2">
+                    <div class="flex items-center gap-3">
+                        <span class="digital-font text-secondary font-bold">${String(i+1).padStart(2,'0')}</span>
+                        <span class="headline-font text-sm">${s.name}</span>
+                    </div>
+                    <span class="digital-font text-tertiary">${s.count.toLocaleString()}</span>
+                </div>
+            `).join('');
+        }
+
+        fillStationRanking();
+        setInterval(fillStationRanking, 5000);
+    });
+    </script>
+
+    <script>
+        const lineStations = ['广州东站','体育中心','体育西路','杨箕','东山口','烈士陵园','农讲所','公园前','西门口','陈家祠','长寿路','黄沙','芳村','花地湾','坑口','西塱'];
+
+        function renderLineStatus(statusList) {
+            const container = document.getElementById('line-status');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="flex flex-col items-center">
+                    ${lineStations.map((name, i) => {
+                        const st = statusList ? statusList.find(function(x) { return x.name === name; }) : null;
+                        const isAbnormal = st && st.status === 'abnormal';
+                        const dotColor = isAbnormal ? '#ef4444' : '#22c55e';
+                        const shadowColor = isAbnormal ? 'rgba(239,68,68,0.6)' : 'rgba(34,197,94,0.6)';
+                        const lineColor = isAbnormal ? 'rgba(239,68,68,0.3)' : 'rgba(34,197,94,0.3)';
+                        const statusText = isAbnormal ? '● 异常' : '● 正常';
+                        const statusColor = isAbnormal ? '#ef4444' : '#22c55e';
+                        return `
+                        <div class="flex items-center gap-2" style="margin:0;">
+                            <div style="display:flex;flex-direction:column;align-items:center;">
+                                <div style="width:15px;height:15px;border-radius:50%;background:${dotColor};box-shadow:0 0 10px ${shadowColor};flex-shrink:0;"></div>
+                                ${i < lineStations.length - 1 ? `<div style="width:10px;height:20px;background:${lineColor};flex-shrink:0;"></div>` : ''}
+                            </div>
+                            <span class="headline-font text-xs text-on-surface" style="min-width:55px;">${name}</span>
+                            <span class="digital-font text-xs" style="color:${statusColor};">${statusText}</span>
+                        </div>
+                    `}).join('')}
+                </div>
+            `;
+        }
+
+        fetch('./data/status.json')
+            .then(r => r.json())
+            .then(data => {
+                renderLineStatus(data.status);
+
+                const hasAbnormal = data.status.some(s => s.status === 'abnormal');
+                const statusEl = document.getElementById('system-status');
+                if (hasAbnormal) {
+                    statusEl.textContent = '异常待处理';
+                    statusEl.style.color = '#ef4444';
+                    statusEl.style.textShadow = '0 0 10px rgba(239,68,68,0.5)';
+                    document.body.classList.add('abnormal-alert');
+                } else {
+                    document.body.classList.remove('abnormal-alert');
+                    statusEl.textContent = '正常运营';
+                    statusEl.style.color = '';
+                    statusEl.style.textShadow = '';
+                }
+
+                const container = document.getElementById('alarm-list');
+                const countEl = document.getElementById('alarm-count');
+                if (container && countEl) {
+                    const alarms = data.status.filter(s => s.status === 'abnormal');
+                    countEl.textContent = alarms.length;
+                    if (alarms.length === 0) {
+                        container.innerHTML = '<div class="text-secondary/40 text-xs text-center py-4">系统运行正常</div>';
+                    } else {
+                        container.innerHTML = alarms.map(alarm => `
+                            <div class="flex items-start gap-2 border-b border-outline-variant/20 pb-2">
+                                <span class="text-red-400 text-xs">●</span>
+                                <div class="flex-1">
+                                    <span class="headline-font text-sm text-on-surface">${alarm.name}</span>
+                                    <span class="digital-font text-xs text-red-400 ml-2">${alarm.message}</span>
+                                    <span class="digital-font text-xs text-secondary/40 ml-2">${alarm.abnormaltime}</span>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            });</script>
+
+    <script>
+        fetch('./data/dashboard.json').then(r => r.json()).then(data => {
+            const hour = new Date().getHours();
+            const isOperating = hour >= 6 && hour <= 24;
+
+            if (isOperating) {
+                document.getElementById('on-time-rate').textContent = data.onTimeRate;
+                document.getElementById('online-trains').textContent = data.onlineTrains;
+            } else {
+                document.getElementById('on-time-rate').textContent = 'N/A';
+                document.getElementById('online-trains').textContent = 'N/A';
+            }
+        });
+    </script>
+
+</body>
+</html>

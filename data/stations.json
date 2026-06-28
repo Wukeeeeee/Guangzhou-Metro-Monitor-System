@@ -1,0 +1,20 @@
+{
+  "stations": [
+    { "id": 1, "name": "广州东站", "transfers": "换乘3号线,11号线,18号线", "isTransfer": "yes", "flow": 28500 },
+    { "id": 2, "name": "体育中心", "transfers": "—", "isTransfer": "no", "flow": 22100 },
+    { "id": 3, "name": "体育西路", "transfers": "换乘3号线", "isTransfer": "yes", "flow": 42850 },
+    { "id": 4, "name": "杨箕", "transfers": "换乘5号线", "isTransfer": "yes", "flow": 19500 },
+    { "id": 5, "name": "东山口", "transfers": "换乘6号线", "isTransfer": "yes", "flow": 29441 },
+    { "id": 6, "name": "烈士陵园", "transfers": "—", "isTransfer": "no", "flow": 16800 },
+    { "id": 7, "name": "农讲所", "transfers": "—", "isTransfer": "no", "flow": 14200 },
+    { "id": 8, "name": "公园前", "transfers": "换乘2号线", "isTransfer": "yes", "flow": 38122 },
+    { "id": 9, "name": "西门口", "transfers": "—", "isTransfer": "no", "flow": 12100 },
+    { "id": 10, "name": "陈家祠", "transfers": "换乘8号线", "isTransfer": "yes", "flow": 21300 },
+    { "id": 11, "name": "长寿路", "transfers": "—", "isTransfer": "no", "flow": 25600 },
+    { "id": 12, "name": "黄沙", "transfers": "换乘6号线", "isTransfer": "yes", "flow": 18300 },
+    { "id": 13, "name": "芳村", "transfers": "换乘11号线,22号线", "isTransfer": "yes", "flow": 15700 },
+    { "id": 14, "name": "花地湾", "transfers": "—", "isTransfer": "no", "flow": 13400 },
+    { "id": 15, "name": "坑口", "transfers": "—", "isTransfer": "no", "flow": 9800 },
+    { "id": 16, "name": "西塱", "transfers": "换乘10号线,22号线,广佛线", "isTransfer": "yes", "flow": 11200 }
+  ]
+}
