@@ -1,6 +1,8 @@
 # Guangzhou-Metro-Monitor-System
 
 广州地铁 1 号线综合监控系统 3D 可视化原型。
+![Uploading image.png…]()
+
 
 基于 CesiumJS 构建的 WebGIS 前端项目，在 3D 地球场景中对广州地铁 1 号线的线路走向、站点分布、客流数据和运行状态进行可视化展示，模拟地铁监控调度系统的核心界面和信息呈现方式。
 
