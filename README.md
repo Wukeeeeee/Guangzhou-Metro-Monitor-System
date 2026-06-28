@@ -1,8 +1,8 @@
-# GZMetroScope
+# Guangzhou-Metro-Monitor-System
 
 广州地铁 1 号线综合监控系统 3D 可视化原型。
 
-基于 CesiumJS 构建，展示地铁线路、站点客流、运行状态等信息的监控仪表盘。
+这是一个基于 CesiumJS 构建的 WebGIS 前端项目，通过 3D 地球场景对广州地铁 1 号线的线路走向、站点分布、客流数据和运行状态进行可视化展示，模拟地铁监控调度系统的核心界面。
 
 ---
 
@@ -47,7 +47,7 @@
 ## 项目结构
 
 ```
-GZMetroScope/
+Guangzhou-Metro-Monitor-System/
 ├── index.html                  # 主页面（布局 + 所有 JavaScript）
 ├── style.css                   # 自定义样式（毛玻璃、告警动画等）
 ├── .gitignore                  # 忽略 apikey.txt、原始 Shapefile 等
@@ -76,6 +76,14 @@ GZMetroScope/
 2. 在 Cesium Ion 注册并获取 Access Token（https://ion.cesium.com）
 3. 将 Token 写入项目根目录下的 `apikey.txt`
 4. 用本地服务器打开 `index.html`（推荐 VS Code Live Server 或 `python -m http.server`）
+
+```bash
+git clone https://github.com/Wukeeeeee/Guangzhou-Metro-Monitor-System.git
+cd Guangzhou-Metro-Monitor-System
+# 将你的 Cesium Ion Token 写入 apikey.txt
+python -m http.server 8080
+# 浏览器打开 http://localhost:8080
+```
 
 注意：CesiumJS 需要跨域加载资源，直接用浏览器打开 `index.html` 无法正常运行，必须使用本地服务器。
 
@@ -110,6 +118,8 @@ GZMetroScope/
 - Entity 管理：Billboard（图标）、Label（标签）、自定义 Material（流光）
 - 前端数据流：fetch 到 JSON 解析到 DOM 渲染的完整链路
 - 自定义 Cesium Material：GLSL 着色器实现流光动画
+- CSS Grid / Flexbox 实现复杂仪表盘布局
+- 前端数据驱动渲染与事件交互
 
 ---
 
