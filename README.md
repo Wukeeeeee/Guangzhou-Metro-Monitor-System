@@ -6,24 +6,32 @@
 
 > 当前数据主要为学习和演示用途，站点客流、运行状态等为模拟数据，不代表真实运营数据。
 
+---
+
 ## 功能
 
-- Cesium 3D 地图展示广州地铁 1 号线线路
+- Cesium 3D 地图展示广州地铁 1 号线线路，金色流光动画效果
 - 加载 GeoJSON 站点坐标并渲染站点图标和标签
 - 点击站点后展示站名、换乘信息、是否换乘站和客流量
 - 站点客流排行
-- 线路运行状态和异常告警列表
+- 线路运行状态（绿/红点）和异常告警列表
 - 准点率、系统状态、在线列车数等监控指标
-- FastAPI 后端提供数据接口
+- 全屏红色告警边框（站点异常时触发）
+- FastAPI 后端提供统一数据接口
+
+---
 
 ## 技术栈
 
 | 模块 | 技术 |
 | --- | --- |
 | 前端 | HTML, CSS, JavaScript, Tailwind CSS |
-| 三维地图 | CesiumJS |
+| 三维地图 | CesiumJS 1.137 |
 | 后端 | Python, FastAPI, Uvicorn |
 | 数据 | JSON, GeoJSON |
+| 动画 | GLSL 自定义着色器材质（流线动画） |
+
+---
 
 ## 项目结构
 
@@ -50,10 +58,12 @@ Guangzhou-Metro-Monitor-System/
 │       ├── alarm.js                    # 运行状态和告警
 │       ├── dashboard.js                # 仪表盘指标
 │       ├── time.js                     # 时间和运营状态
-│       └── PolylineTrailLinkMaterialProperty.js
+│       └── PolylineTrailLinkMaterialProperty.js   # 自定义 GLSL 流光材质
 ├── .gitignore
 └── README.md
 ```
+
+---
 
 ## 后端接口
 
@@ -66,6 +76,9 @@ Guangzhou-Metro-Monitor-System/
 | `GET /stationPoint` | 返回站点 GeoJSON |
 | `GET /line` | 返回线路 GeoJSON |
 | `GET /logo` | 返回站点图标 |
+| `GET /info` | 返回完整站点数据 |
+
+---
 
 ## 运行方式
 
@@ -91,11 +104,7 @@ pip install fastapi uvicorn
 python -m uvicorn backend.main:app --reload --port 8000
 ```
 
-后端启动后可以访问：
-
-```text
-http://127.0.0.1:8000/docs
-```
+后端启动后可以访问 `http://127.0.0.1:8000/docs` 查看 Swagger API 文档。
 
 ### 4. 启动前端静态服务
 
@@ -105,11 +114,9 @@ http://127.0.0.1:8000/docs
 python -m http.server 8002
 ```
 
-浏览器打开：
+浏览器打开 `http://127.0.0.1:8002/fronted/index.html`。
 
-```text
-http://127.0.0.1:8002/fronted/index.html
-```
+---
 
 ## 数据流
 
@@ -125,20 +132,72 @@ backend/main.py
 返回 JSON / GeoJSON / 图片给前端
 ```
 
-前端不再直接读取所有本地数据文件，而是逐步改为通过 FastAPI 接口获取数据。
+前端所有数据均通过 FastAPI 接口获取，不直接读取本地文件。
 
-## 当前说明
+---
 
-这是一个阶段性学习项目，主要目标是把原本偏静态的 Cesium 前端页面逐步拆分为：
+## 当前状态
 
-- 独立前端文件结构
-- 独立 JavaScript 功能模块
-- FastAPI 后端数据接口
-- 后续可继续接入 SQLite / PostgreSQL / PostGIS
+项目已完成基础功能闭环，处于原型完善阶段。
+
+### 已完成功能
+
+- Cesium 3D 地球场景搭建，相机固定广州区域
+- 1 号线线路渲染 + 金色流光动画（自定义 GLSL Material）
+- 16 个站点图标 + 名称标注
+- 站点点击交互（点击地图站点 → 右侧详情面板）
+- 左侧客流排行（实时排序展示）
+- 右侧运行状态图（绿点正常 / 红点异常）
+- 系统告警面板 + 全屏红色闪烁边框
+- 底部仪表盘卡片（准点率、系统状态、在线列车数）
+- 实时时钟 + 运营时段判断（06:00 - 24:00）
+- 深色主题 + 毛玻璃效果 + 科技感 UI
+- FastAPI 后端 8 个数据接口
+
+### 已知问题
+
+- 客流排行每 5 秒重新渲染但数据不刷新（未重新请求 API）
+- 仪表盘仅在页面加载时请求一次，非运营时段无法自动切换
+- 系统状态被两个模块同时控制，存在逻辑冲突
+- 站点数据 `isTransfer` 使用字符串 `"yes"/"no"` 而非 Boolean
+
+### 后续计划
+
+- 客流排行定时刷新（轮询 API）
+- 仪表盘定时轮询
+- 统一状态管理模块
+- GitHub Actions 自动部署
+- 接入真实数据源（PostGIS 可选）
+
+---
+
+## 学习笔记
+
+本项目中涉及的知识点：
+
+- Cesium 场景搭建：Viewer 初始化、控件配置、相机飞行定位
+- GeoJSON 数据处理：从 Shapefile 导出、CRS 坐标参考系处理、Cesium 加载适配
+- Cesium Entity 管理：Billboard（图标）、Label（标签）、Polyline（路径）
+- 自定义 Cesium Material：通过 GLSL 着色器实现自定义材质效果（流光动画）
+- 场景拾取交互：ScreenSpaceEventHandler 实现点击检测与 Entity 信息读取
+- CSS 布局：Grid 网格布局、Flexbox 弹性布局、毛玻璃效果
+- 前端数据流：fetch 异步加载、JSON 解析、DOM 渲染
+- CSS 动画：关键帧动画实现闪烁告警效果
+- FastAPI 后端：CORS 中间件、JSON/GeoJSON/图片文件服务
+
+---
 
 ## AI 辅助说明
 
-本项目开发过程中使用了 AI 辅助生成和重构代码。本人主要参与了项目选题、GIS 数据整理、功能拆分、接口调试、前后端联调和项目结构调整。
+本项目代码由 AI 辅助生成，但在以下方面由本人主导完成：
+
+- 项目整体构思与功能规划
+- UI 布局与交互逻辑设计决策
+- GIS 数据处理：从原始 Shapefile 导出、坐标转换、GeoJSON 格式适配
+- 需求定义、功能测试与 bug 调试
+- 项目结构组织与 GitHub 部署管理
+
+---
 
 ## License
 
