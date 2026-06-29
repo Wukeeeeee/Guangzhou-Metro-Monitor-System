@@ -1,9 +1,5 @@
 {
   "onTimeRate": 99.8,
   "onlineTrains": 482,
-  "systemStatus": "NORMAL",
-  "trainCountdown": [
-    { "line": "1号线", "direction": "广州东站→西塱", "trainId": "L1-018", "arrival": "02:15" },
-    { "line": "1号线", "direction": "西塱→广州东站", "trainId": "L1-022", "arrival": "04:50" }
-  ]
+  "systemStatus": "ABNORMAL"
 }

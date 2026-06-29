@@ -1,6 +1,10 @@
 # Cesium Ion Access Token (DO NOT COMMIT)
 apikey.txt
 
+# Python cache
+__pycache__/
+*.pyc
+
 # Editor settings
 .vscode/
 .idea/
