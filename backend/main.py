@@ -1,11 +1,12 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
 import json
 from pathlib import Path
 
-app = FastAPI()
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 
+
+app = FastAPI()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 app.add_middleware(
@@ -17,43 +18,49 @@ app.add_middleware(
 )
 
 
-@app.get('/cesium')
+def read_json(path: Path):
+    with path.open("r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+@app.get("/cesium")
 def getapi():
-    token = (BASE_DIR / 'fronted' / 'apikey.txt').read_text(encoding='utf-8').strip()
-    return {'token': token}
+    token = (BASE_DIR / "fronted" / "apikey.txt").read_text(encoding="utf-8").strip()
+    return {"token": token}
 
-@app.get('/dashboard')
+
+@app.get("/dashboard")
 def getdashboard():
-    with open(BASE_DIR / 'data' / 'dashboard.json', 'r', encoding='utf-8') as f:
-        dashboard = json.load(f)
-    return dashboard
+    return read_json(BASE_DIR / "data" / "dashboard.json")
 
-@app.get('/status')
+
+@app.get("/status")
 def getstatus():
-    with open(BASE_DIR / 'data' / 'status.json', 'r', encoding='utf-8') as f:
-        status = json.load(f)
-    return status
+    return read_json(BASE_DIR / "data" / "status.json")
 
-@app.get('/ranking')
+
+@app.get("/ranking")
 def getranking():
-    with open(BASE_DIR / 'data' / 'stations.json', 'r', encoding='utf-8') as f:
-        station = json.load(f)
+    station = read_json(BASE_DIR / "data" / "stations.json")
     return station["stations"]
 
-@app.get('/stationPoint')
+
+@app.get("/stationPoint")
 def getstationPoint():
-    with open(BASE_DIR / 'data' / 'GZLine1_Station.geojson', 'r', encoding='utf-8') as f:
-        station = json.load(f)
-    return station
+    return read_json(BASE_DIR / "data" / "GZLine1_Station.geojson")
 
-@app.get('/line')
+
+@app.get("/line")
 def getline():
-    with open(BASE_DIR / 'data' / 'GZLine1.geojson', 'r', encoding='utf-8') as f:
-        line = json.load(f)
-    return line
+    return read_json(BASE_DIR / "data" / "GZLine1.geojson")
 
-@app.get('/logo')
+
+@app.get("/logo")
 def getlogo():
-    with open(BASE_DIR / 'fronted' / 'GZmetro.jpg', 'rb') as f:
-        logo = f.read()
+    logo = (BASE_DIR / "fronted" / "GZmetro.jpg").read_bytes()
     return Response(content=logo, media_type="image/jpeg")
+
+
+@app.get("/info")
+def getinfo():
+    return read_json(BASE_DIR / "data" / "stations.json")

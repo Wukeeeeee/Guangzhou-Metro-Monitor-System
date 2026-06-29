@@ -78,13 +78,13 @@ async function loadStationPoints(viewer) {
     const stationGeoJson = await fetchJson(`${API_BASE}/stationPoint`);
     delete stationGeoJson.crs;
 
-    const stationData = await fetchJson(`${API_BASE}/ranking`);
-    renderStationPoints(viewer, stationGeoJson, stationData);
+    const stations = await fetchJson(`${API_BASE}/ranking`);
+    renderStationPoints(viewer, stationGeoJson, stations);
 }
 
-function renderStationPoints(viewer, stationGeoJson, stationData) {
+function renderStationPoints(viewer, stationGeoJson, stations) {
     for (const station of stationGeoJson.geometries) {
-        const stationInfo = stationData.find(s => s.name === station.name);
+        const stationInfo = stations.find(item => item.name === station.name);
         const position = Cesium.Cartesian3.fromDegrees(
             station.coordinates[0],
             station.coordinates[1]
