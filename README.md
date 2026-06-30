@@ -198,19 +198,6 @@ python backend/init.py      # 从 JSON 文件导入数据到 SQLite
 - FastAPI 后端：CORS 中间件、JSON/GeoJSON/图片文件服务
 
 ---
-
-## AI 辅助说明
-
-本项目代码由 AI 辅助生成，但在以下方面由本人主导完成：
-
-- 项目整体构思与功能规划
-- UI 布局与交互逻辑设计决策
-- GIS 数据处理：从原始 Shapefile 导出、坐标转换、GeoJSON 格式适配
-- 需求定义、功能测试与 bug 调试
-- 项目结构组织与 GitHub 部署管理
-
----
-
 ## License
 
 MIT
