@@ -8,6 +8,10 @@
 
 ---
 
+![系统界面截图](screenshots/dashboard.png)
+
+---
+
 ## 功能
 
 - Cesium 3D 地图展示广州地铁 1 号线线路，金色流光动画效果
