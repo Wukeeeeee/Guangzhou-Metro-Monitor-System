@@ -6,7 +6,7 @@
     <title>广州地铁综合监控系统 </title>
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.137/Build/Cesium/Cesium.js"></script>
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.137/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
     <link rel="stylesheet" href="style.css">
@@ -89,7 +89,7 @@
             <section class="frosted-panel flex flex-col shrink-0">
                 <div class="p-4 border-b border-secondary/20 flex justify-between items-center bg-surface-container-high/40 shrink-0">
                     <h3 class="headline-font text-on-surface text-sm">实时站点客流排行</h3>
-                    <span class="text-[10px] text-secondary/60 digital-font">UNITS: PPH</span>
+                    <span class="text-[10px] text-secondary/60 digital-font">单位：人次</span>
                 </div>
                 <div class="p-4 space-y-3" id="station-ranking">
                 </div>
@@ -98,7 +98,7 @@
             <section class="flex-1 frosted-panel flex flex-col overflow-hidden min-h-0">
                 <div class="p-4 border-b border-secondary/20 flex justify-between items-center bg-surface-container-high/40 shrink-0">
                     <h3 class="headline-font text-on-surface text-sm">系统问题告警</h3>
-                    <span class="text-[10px] text-red-400 digital-font" id="alarm-count">0</span>
+                    <span class="text-[20px] text-red-400 digital-font" id="alarm-count">0</span>
                 </div>
                 <div class="flex-1 p-4 space-y-2 overflow-y-auto scrollbar-thin min-h-0" id="alarm-list">
                 </div>

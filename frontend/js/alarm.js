@@ -60,9 +60,9 @@ if (container && countEl) {
             <div class="flex items-start gap-2 border-b border-outline-variant/20 pb-2">
                 <span class="text-red-400 text-xs">●</span>
                 <div class="flex-1">
-                    <span class="headline-font text-sm text-on-surface">${alarm.name}</span>
-                    <span class="digital-font text-xs text-red-400 ml-2">${alarm.message}</span>
-                    <span class="digital-font text-xs text-secondary/40 ml-2">${alarm.abnormaltime}</span>
+                    <span class="headline-font text-lg text-on-surface">${alarm.name}</span>
+                    <span class="digital-font text-lg text-red-400 ml-2">${alarm.message}</span>
+                    <span class="digital-font text-lg text-secondary/40 ml-2">${alarm.abnormaltime}</span>
                 </div>
             </div>
         `).join('');

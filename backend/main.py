@@ -7,6 +7,10 @@ from fastapi.responses import Response
 
 
 app = FastAPI()
+
+
+#E:\...\GZ-Metro-System\backend\main.py
+#项目根目录为E:\...\GZ-Metro-System
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 app.add_middleware(
@@ -25,7 +29,7 @@ def read_json(path: Path):
 
 @app.get("/cesium")
 def getapi():
-    token = (BASE_DIR / "fronted" / "apikey.txt").read_text(encoding="utf-8").strip()
+    token = (BASE_DIR / "frontend" / "apikey.txt").read_text(encoding="utf-8").strip()
     return {"token": token}
 
 
@@ -57,7 +61,7 @@ def getline():
 
 @app.get("/logo")
 def getlogo():
-    logo = (BASE_DIR / "fronted" / "GZmetro.jpg").read_bytes()
+    logo = (BASE_DIR / "frontend" / "GZmetro.jpg").read_bytes()
     return Response(content=logo, media_type="image/jpeg")
 
 

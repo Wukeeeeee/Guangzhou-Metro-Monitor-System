@@ -5,18 +5,20 @@ async function initRanking() {
     function fillStationRanking() {
         const container = document.getElementById('station-ranking');
         if (!container) return;
-
+        //遍历元素,重排元素,降序
         const data = stations
             .map(station => ({
                 name: station.name,
                 count: station.flow,
             }))
+            //负数不变，正数交换
             .sort((a, b) => b.count - a.count);
 
         container.innerHTML = data.map((station, index) => `
             <div class="flex items-center justify-between border-b border-outline-variant/30 pb-2">
                 <div class="flex items-center gap-3">
-                    <span class="digital-font text-secondary font-bold">${String(index + 1).padStart(2, '0')}</span>
+                <!-- 保证数字两位数 -->
+                    <span class="digital-font text-sm font-bold">${String(index + 1).padStart(2, '0')}</span>
                     <span class="headline-font text-sm">${station.name}</span>
                 </div>
                 <span class="digital-font text-tertiary">${station.count.toLocaleString()}</span>
@@ -25,6 +27,7 @@ async function initRanking() {
     }
 
     fillStationRanking();
+    //每5秒刷新一次
     setInterval(fillStationRanking, 5000);
 }
 

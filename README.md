@@ -46,7 +46,7 @@ Guangzhou-Metro-Monitor-System/
 │   ├── GZLine1.geojson                 # 1 号线线路 GeoJSON
 │   ├── GZLine1_Station.geojson         # 1 号线站点 GeoJSON
 │   └── GZ_FS_Metro.geojson             # 广州地铁线网数据
-├── fronted/
+├── frontend/
 │   ├── index.html                      # 前端页面
 │   ├── style.css                       # 页面样式
 │   ├── GZmetro.jpg                     # 站点图标
@@ -84,10 +84,10 @@ Guangzhou-Metro-Monitor-System/
 
 ### 1. 准备 Cesium Token
 
-在 `fronted/` 目录下创建 `apikey.txt`，写入自己的 Cesium Ion Access Token。
+在 `frontend/` 目录下创建 `apikey.txt`，写入自己的 Cesium Ion Access Token。
 
 ```text
-fronted/apikey.txt
+frontend/apikey.txt
 ```
 
 `apikey.txt` 已加入 `.gitignore`，不要提交到 GitHub。
@@ -114,20 +114,20 @@ python -m uvicorn backend.main:app --reload --port 8000
 python -m http.server 8002
 ```
 
-浏览器打开 `http://127.0.0.1:8002/fronted/index.html`。
+浏览器打开 `http://127.0.0.1:8002/frontend/index.html`。
 
 ---
 
 ## 数据流
 
 ```text
-fronted/js/*.js
+frontend/js/*.js
         |
         | fetch("http://127.0.0.1:8000/...")
         v
 backend/main.py
         |
-        | 读取 data/*.json, data/*.geojson, fronted/GZmetro.jpg
+        | 读取 data/*.json, data/*.geojson, frontend/GZmetro.jpg
         v
 返回 JSON / GeoJSON / 图片给前端
 ```
@@ -159,7 +159,14 @@ backend/main.py
 - 客流排行每 5 秒重新渲染但数据不刷新（未重新请求 API）
 - 仪表盘仅在页面加载时请求一次，非运营时段无法自动切换
 - 系统状态被两个模块同时控制，存在逻辑冲突
-- 站点数据 `isTransfer` 使用字符串 `"yes"/"no"` 而非 Boolean
+- `onlineTrains` 数据为固定值，未实现动态计算
+
+### 近期修复
+
+- 站点数据 `isTransfer` 由字符串 `"yes"/"no"` 改为 Boolean 类型，前后端对齐
+- 文件夹名 `fronted` 更正为 `frontend`，更新所有引用路径
+- 补充 JS 文件中文注释，便于后续维护
+- 客流排行单位标识由 `PPH` 改为 `人次`，更贴合数据含义
 
 ### 后续计划
 

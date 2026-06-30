@@ -20,6 +20,7 @@ async function initCesium() {
 }
 
 function createViewer() {
+    //创建viewer,关闭组件
     const viewer = new Cesium.Viewer('cesiumcontainer', {
         animation: false,
         timeline: false,
@@ -31,8 +32,9 @@ function createViewer() {
         sceneModePicker: false,
         fullscreenButton: false,
     });
-
+    //关闭版权信息
     viewer._cesiumWidget._creditContainer.style.display = 'none';
+    //关闭点击双击事件
     viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
     viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
 
@@ -47,7 +49,7 @@ function createViewer() {
 
     return viewer;
 }
-
+//加载线路
 async function loadLine(viewer) {
     const lineResult = await fetchJson(`${API_BASE}/line`);
     delete lineResult.crs;
@@ -60,12 +62,14 @@ async function loadLine(viewer) {
     });
 
     viewer.dataSources.add(line);
-
+    // 添加轨迹的颜色，速度
     const trailMaterial = new PolylineTrailLinkMaterialProperty(
         Cesium.Color.fromCssColorString('#F3D03E'),
         120
     );
 
+    // 设置轨迹的宽度和材质
+    //一个geojson文件中可能存在多端线
     for (const entity of line.entities.values) {
         if (entity.polyline) {
             entity.polyline.width = 10;
@@ -74,6 +78,7 @@ async function loadLine(viewer) {
     }
 }
 
+//添加站点
 async function loadStationPoints(viewer) {
     const stationGeoJson = await fetchJson(`${API_BASE}/stationPoint`);
     delete stationGeoJson.crs;
@@ -84,12 +89,14 @@ async function loadStationPoints(viewer) {
 
 function renderStationPoints(viewer, stationGeoJson, stations) {
     for (const station of stationGeoJson.geometries) {
+        //遍历数组，获取站点信息
         const stationInfo = stations.find(item => item.name === station.name);
+        //位置信息
         const position = Cesium.Cartesian3.fromDegrees(
             station.coordinates[0],
             station.coordinates[1]
         );
-
+        //添加实体
         const entity = viewer.entities.add({
             name: 'station',
             position,
@@ -105,30 +112,19 @@ function renderStationPoints(viewer, stationGeoJson, stations) {
                 fillColor: Cesium.Color.WHITE,
                 outlineColor: Cesium.Color.BLACK,
                 outlineWidth: 2,
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                pixelOffset: new Cesium.Cartesian2(0, -30),
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,//填充和描边
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,//垂直对齐方式
+                pixelOffset: new Cesium.Cartesian2(0, -30),//像素偏移
             },
         });
-
+        //添加信息，stationData不是entity的属性，在添加的时候不能直接添加
         entity.stationData = stationInfo;
     }
 }
 
-let selectedEntity = null;
 
-function highlightStation(entity) {
-    if (selectedEntity) {
-        selectedEntity.billboard.color = Cesium.Color.WHITE;
-        selectedEntity.billboard.scale = 1.0;
-    }
 
-    selectedEntity = entity;
-    if (entity && entity.billboard) {
-        entity.billboard.color = Cesium.Color.YELLOW;
-        entity.billboard.scale = 1.5;
-    }
-}
+
 
 initCesium().catch(error => {
     console.error('Cesium 初始化失败:', error);
