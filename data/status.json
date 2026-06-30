@@ -1,20 +1,100 @@
 {
   "status": [
-    { "name": "广州东站", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "体育中心", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "体育西路", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "杨箕", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "东山口", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "烈士陵园", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "农讲所", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "公园前", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "西门口", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "陈家祠", "status": "abnormal", "message": "设备故障", "abnormaltime": "2026-06-28 10:00:00" },
-    { "name": "长寿路", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "黄沙", "status": "abnormal", "message": "设备故障", "abnormaltime": "2026-06-28 10:00:00" },
-    { "name": "芳村", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "花地湾", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "坑口", "status": "normal", "message": "", "abnormaltime": "" },
-    { "name": "西塱", "status": "abnormal", "message": "客流拥堵", "abnormaltime": "2026-06-28 13:00:00" }
+    {
+      "name": "广州东站",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "体育中心",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "体育西路",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "杨箕",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "东山口",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "烈士陵园",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "农讲所",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "公园前",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "西门口",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "陈家祠",
+      "status": true,
+      "statusinfo": "设备故障",
+      "errortime": "2026-06-28 10:00:00"
+    },
+    {
+      "name": "长寿路",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "黄沙",
+      "status": true,
+      "statusinfo": "设备故障",
+      "errortime": "2026-06-28 10:00:00"
+    },
+    {
+      "name": "芳村",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "花地湾",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "坑口",
+      "status": false,
+      "statusinfo": "",
+      "errortime": ""
+    },
+    {
+      "name": "西塱",
+      "status": true,
+      "statusinfo": "客流拥堵",
+      "errortime": "2026-06-28 13:00:00"
+    }
   ]
 }

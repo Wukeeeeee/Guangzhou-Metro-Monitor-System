@@ -32,7 +32,7 @@
 | 前端 | HTML, CSS, JavaScript, Tailwind CSS |
 | 三维地图 | CesiumJS 1.137 |
 | 后端 | Python, FastAPI, Uvicorn |
-| 数据 | JSON, GeoJSON |
+| 数据库 | SQLite, SQLAlchemy ORM |
 | 动画 | GLSL 自定义着色器材质（流线动画） |
 
 ---
@@ -42,8 +42,12 @@
 ```text
 Guangzhou-Metro-Monitor-System/
 ├── backend/
-│   └── main.py                         # FastAPI 后端接口
+│   ├── main.py                         # FastAPI 后端接口
+│   ├── database.py                     # SQLite 数据库连接配置
+│   ├── models.py                       # ORM 数据表结构定义
+│   └── init.py                         # 数据初始化导入脚本
 ├── data/
+│   ├── metro.db                        # SQLite 数据库文件
 │   ├── stations.json                   # 站点属性数据
 │   ├── status.json                     # 运行状态和告警数据
 │   ├── dashboard.json                  # 仪表盘数据
@@ -71,16 +75,16 @@ Guangzhou-Metro-Monitor-System/
 
 ## 后端接口
 
-| 接口 | 说明 |
-| --- | --- |
-| `GET /cesium` | 返回 Cesium Ion Token |
-| `GET /dashboard` | 返回仪表盘指标 |
-| `GET /status` | 返回站点运行状态和告警 |
-| `GET /ranking` | 返回站点属性和客流数据 |
-| `GET /stationPoint` | 返回站点 GeoJSON |
-| `GET /line` | 返回线路 GeoJSON |
-| `GET /logo` | 返回站点图标 |
-| `GET /info` | 返回完整站点数据 |
+| 接口 | 说明 | 数据源 |
+| --- | --- | --- |
+| `GET /cesium` | 返回 Cesium Ion Token | 文件 |
+| `GET /dashboard` | 返回仪表盘指标 | JSON 文件（待改数据库） |
+| `GET /status` | 返回站点运行状态和告警 | JSON 文件（待改数据库） |
+| `GET /ranking` | 返回站点属性和客流数据 | JSON 文件（待改数据库） |
+| `GET /stationPoint` | 返回站点 GeoJSON | 文件 |
+| `GET /line` | 返回线路 GeoJSON | 文件 |
+| `GET /logo` | 返回站点图标 | 文件 |
+| `GET /info` | 返回完整站点数据 | JSON 文件（待改数据库） |
 
 ---
 
@@ -131,12 +135,17 @@ frontend/js/*.js
         v
 backend/main.py
         |
-        | 读取 data/*.json, data/*.geojson, frontend/GZmetro.jpg
+        | [当前] 读取 data/*.json 文件  /  [目标] 查询 data/metro.db 数据库
         v
 返回 JSON / GeoJSON / 图片给前端
 ```
 
 前端所有数据均通过 FastAPI 接口获取，不直接读取本地文件。
+
+数据库初始化：
+```bash
+python backend/init.py      # 从 JSON 文件导入数据到 SQLite
+```
 
 ---
 
@@ -157,6 +166,7 @@ backend/main.py
 - 实时时钟 + 运营时段判断（06:00 - 24:00）
 - 深色主题 + 毛玻璃效果 + 科技感 UI
 - FastAPI 后端 8 个数据接口
+- SQLite 数据库接入，数据可通过 upsert 动态更新
 
 ### 已知问题
 
@@ -174,6 +184,7 @@ backend/main.py
 
 ### 后续计划
 
+- 改造 main.py 从数据库读取数据（当前仍读 JSON 文件）
 - 客流排行定时刷新（轮询 API）
 - 仪表盘定时轮询
 - 统一状态管理模块
