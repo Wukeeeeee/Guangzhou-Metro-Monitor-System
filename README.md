@@ -47,7 +47,6 @@ Guangzhou-Metro-Monitor-System/
 │   ├── models.py                       # ORM 数据表结构定义
 │   └── init.py                         # 数据初始化导入脚本
 ├── data/
-│   ├── metro.db                        # SQLite 数据库文件
 │   ├── stations.json                   # 站点属性数据
 │   ├── status.json                     # 运行状态和告警数据
 │   ├── dashboard.json                  # 仪表盘数据
@@ -78,13 +77,13 @@ Guangzhou-Metro-Monitor-System/
 | 接口 | 说明 | 数据源 |
 | --- | --- | --- |
 | `GET /cesium` | 返回 Cesium Ion Token | 文件 |
-| `GET /dashboard` | 返回仪表盘指标 | JSON 文件（待改数据库） |
-| `GET /status` | 返回站点运行状态和告警 | JSON 文件（待改数据库） |
-| `GET /ranking` | 返回站点属性和客流数据 | JSON 文件（待改数据库） |
+| `GET /dashboard` | 返回仪表盘指标 | JSON 文件 |
+| `GET /status` | 返回站点运行状态和告警 | JSON 文件 |
+| `GET /ranking` | 返回站点属性和客流数据 | JSON 文件 |
 | `GET /stationPoint` | 返回站点 GeoJSON | 文件 |
 | `GET /line` | 返回线路 GeoJSON | 文件 |
 | `GET /logo` | 返回站点图标 | 文件 |
-| `GET /info` | 返回完整站点数据 | JSON 文件（待改数据库） |
+| `GET /info` | 返回完整站点数据 | JSON 文件 |
 
 ---
 
@@ -103,10 +102,16 @@ frontend/apikey.txt
 ### 2. 安装后端依赖
 
 ```bash
-pip install fastapi uvicorn
+pip install fastapi uvicorn sqlalchemy
 ```
 
-### 3. 启动后端
+### 3. 初始化数据库（可选）
+
+```bash
+python backend/init.py
+```
+
+### 4. 启动后端
 
 ```bash
 python -m uvicorn backend.main:app --reload --port 8000
@@ -114,7 +119,7 @@ python -m uvicorn backend.main:app --reload --port 8000
 
 后端启动后可以访问 `http://127.0.0.1:8000/docs` 查看 Swagger API 文档。
 
-### 4. 启动前端静态服务
+### 5. 启动前端静态服务
 
 在项目根目录执行：
 
@@ -135,14 +140,15 @@ frontend/js/*.js
         v
 backend/main.py
         |
-        | [当前] 读取 data/*.json 文件  /  [目标] 查询 data/metro.db 数据库
+        | 读取 data/*.json, data/*.geojson, frontend/GZmetro.jpg
         v
 返回 JSON / GeoJSON / 图片给前端
 ```
 
 前端所有数据均通过 FastAPI 接口获取，不直接读取本地文件。
 
-数据库初始化：
+目前已建立 SQLite 数据库（`data/metro.db`）和 ORM 模型，可通过 `init.py` 从 JSON 文件导入数据，但后端 API 尚未改为从数据库读取。
+
 ```bash
 python backend/init.py      # 从 JSON 文件导入数据到 SQLite
 ```
@@ -166,30 +172,14 @@ python backend/init.py      # 从 JSON 文件导入数据到 SQLite
 - 实时时钟 + 运营时段判断（06:00 - 24:00）
 - 深色主题 + 毛玻璃效果 + 科技感 UI
 - FastAPI 后端 8 个数据接口
-- SQLite 数据库接入，数据可通过 upsert 动态更新
-
-### 已知问题
-
-- 客流排行每 5 秒重新渲染但数据不刷新（未重新请求 API）
-- 仪表盘仅在页面加载时请求一次，非运营时段无法自动切换
-- 系统状态被两个模块同时控制，存在逻辑冲突
-- `onlineTrains` 数据为固定值，未实现动态计算
-
-### 近期修复
-
-- 站点数据 `isTransfer` 由字符串 `"yes"/"no"` 改为 Boolean 类型，前后端对齐
-- 文件夹名 `fronted` 更正为 `frontend`，更新所有引用路径
-- 补充 JS 文件中文注释，便于后续维护
-- 客流排行单位标识由 `PPH` 改为 `人次`，更贴合数据含义
+- SQLite 数据库 + SQLAlchemy ORM 搭建完成，可通过 init.py 导入数据
 
 ### 后续计划
 
-- 改造 main.py 从数据库读取数据（当前仍读 JSON 文件）
+- 将后端 API 从 JSON 文件读取改为从 SQLite 数据库查询
+- 添加数据写入接口，实现数据动态更新
 - 客流排行定时刷新（轮询 API）
 - 仪表盘定时轮询
-- 统一状态管理模块
-- GitHub Actions 自动部署
-- 接入真实数据源（PostGIS 可选）
 
 ---
 
