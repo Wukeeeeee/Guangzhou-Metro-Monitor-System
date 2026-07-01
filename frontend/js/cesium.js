@@ -93,8 +93,8 @@ function renderStationPoints(viewer, stationGeoJson, stations) {
         const stationInfo = stations.find(item => item.name === station.name);
         //位置信息
         const position = Cesium.Cartesian3.fromDegrees(
-            station.coordinates[0],
-            station.coordinates[1]
+            station.longitude,
+            station.latitude
         );
         //添加实体
         const entity = viewer.entities.add({

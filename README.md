@@ -2,7 +2,7 @@
 
 广州地铁 1 号线综合监控系统 WebGIS 原型。
 
-项目基于 CesiumJS、原生 JavaScript 和 FastAPI 构建，前端负责 3D 地图展示、站点交互和监控面板渲染，后端负责读取 JSON/GeoJSON/图片资源并以 API 形式提供给前端。
+项目基于 CesiumJS、原生 JavaScript 和 FastAPI 构建，前端负责 3D 地图展示、站点交互和监控面板渲染，后端从 SQLite 数据库提供数据接口。
 
 > 当前数据主要为学习和演示用途，站点客流、运行状态等为模拟数据，不代表真实运营数据。
 
@@ -77,10 +77,10 @@ Guangzhou-Metro-Monitor-System/
 | 接口 | 说明 | 数据源 |
 | --- | --- | --- |
 | `GET /cesium` | 返回 Cesium Ion Token | 文件 |
-| `GET /dashboard` | 返回仪表盘指标 | JSON 文件 |
-| `GET /status` | 返回站点运行状态和告警 | JSON 文件 |
-| `GET /ranking` | 返回站点属性和客流数据 | JSON 文件 |
-| `GET /stationPoint` | 返回站点 GeoJSON | 文件 |
+| `GET /dashboard` | 返回仪表盘指标 | SQLite |
+| `GET /status` | 返回站点运行状态和告警 | SQLite |
+| `GET /ranking` | 返回站点属性和客流数据 | SQLite |
+| `GET /stationPoint` | 返回站点坐标 | SQLite |
 | `GET /line` | 返回线路 GeoJSON | 文件 |
 | `GET /logo` | 返回站点图标 | 文件 |
 | `GET /info` | 返回完整站点数据 | JSON 文件 |
@@ -102,7 +102,7 @@ frontend/apikey.txt
 ### 2. 安装后端依赖
 
 ```bash
-pip install fastapi uvicorn sqlalchemy
+pip install -r requirements.txt
 ```
 
 ### 3. 初始化数据库（可选）
@@ -140,14 +140,15 @@ frontend/js/*.js
         v
 backend/main.py
         |
-        | 读取 data/*.json, data/*.geojson, frontend/GZmetro.jpg
+        | ┌─ SQLite 数据库（dashboard, status, ranking, stationPoint）
+        | └─ 直接读文件（cesium, line, logo, info）
         v
 返回 JSON / GeoJSON / 图片给前端
 ```
 
 前端所有数据均通过 FastAPI 接口获取，不直接读取本地文件。
 
-目前已建立 SQLite 数据库（`data/metro.db`）和 ORM 模型，可通过 `init.py` 从 JSON 文件导入数据，但后端 API 尚未改为从数据库读取。
+数据库使用 SQLite（`data/metro.db`），通过 `init.py` 从 JSON 文件导入初始数据。
 
 ```bash
 python backend/init.py      # 从 JSON 文件导入数据到 SQLite
@@ -173,12 +174,12 @@ python backend/init.py      # 从 JSON 文件导入数据到 SQLite
 - 深色主题 + 毛玻璃效果 + 科技感 UI
 - FastAPI 后端 8 个数据接口
 - SQLite 数据库 + SQLAlchemy ORM 搭建完成，可通过 init.py 导入数据
+- 4 个 API 接口从 JSON 文件迁移至 SQLite 数据库查询（dashboard / status / ranking / stationPoint）
 
 ### 后续计划
 
-- 将后端 API 从 JSON 文件读取改为从 SQLite 数据库查询
-- 添加数据写入接口，实现数据动态更新
-- 客流排行定时刷新（轮询 API）
+- 添加数据写入/更新接口，实现数据动态更新
+- 客流排行定时从 API 刷新（目前仅前端 setInterval 重渲染）
 - 仪表盘定时轮询
 
 ---

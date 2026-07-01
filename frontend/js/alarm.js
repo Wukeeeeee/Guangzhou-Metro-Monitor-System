@@ -62,7 +62,7 @@ if (container && countEl) {
                 <div class="flex-1">
                     <span class="headline-font text-lg text-on-surface">${alarm.name}</span>
                     <span class="digital-font text-lg text-red-400 ml-2">${alarm.message}</span>
-                    <span class="digital-font text-lg text-secondary/40 ml-2">${alarm.abnormaltime}</span>
+                    <span class="digital-font text-lg text-secondary/20 ml-2">${alarm.abnormaltime}</span>
                 </div>
             </div>
         `).join('');
@@ -70,3 +70,17 @@ if (container && countEl) {
 }}
 
 initStatus();
+
+
+function addAlarmToList(name, message, abnormaltime) {
+    const container = document.getElementById('alarm-list');
+    container.innerHTML = `
+            <div class="flex items-start gap-2 border-b border-outline-variant/20 pb-2">
+                <span class="text-red-400 text-xs">●</span>
+                <div class="flex-1">
+                    <span class="headline-font text-lg text-on-surface">${name}</span>
+                    <span class="digital-font text-lg text-red-400 ml-2">${message}</span>
+                    <span class="digital-font text-lg text-secondary/20 ml-2">${abnormaltime}</span>
+                </div>
+            </div>
+        `;}

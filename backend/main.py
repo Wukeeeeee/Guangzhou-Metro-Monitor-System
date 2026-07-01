@@ -1,9 +1,14 @@
 import json
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+
+from .database import get_db
+from .models import Station, Stationinfo, Dashboard, Stationstatus
 
 
 app = FastAPI()
@@ -34,24 +39,65 @@ def getapi():
 
 
 @app.get("/dashboard")
-def getdashboard():
-    return read_json(BASE_DIR / "data" / "dashboard.json")
+def getdashboard(db: Session = Depends(get_db)):
+    dashboardStatus = db.query(Dashboard).order_by(Dashboard.updatetime.desc()).first()
+    if not dashboardStatus:
+        return {"onTimeRate": "N/A", "onlineTrains": "N/A", "systemStatus": "N/A", "updatetime": ""}
+    return {
+        "onTimeRate": dashboardStatus.onTimeRate,
+        "onlineTrains": dashboardStatus.onlineTrains,
+        "systemStatus": dashboardStatus.systemStatus,
+        "updatetime": dashboardStatus.updatetime}
 
 
 @app.get("/status")
-def getstatus():
-    return read_json(BASE_DIR / "data" / "status.json")
+def getstatus(db: Session = Depends(get_db)):
+    # 每个站取最新一条状态
+    subq = db.query(
+        Stationstatus.name,
+        func.max(Stationstatus.updatetime).label("max_time")
+    ).group_by(Stationstatus.name).subquery()
+
+    latest = db.query(Stationstatus).join(
+        subq,
+        (Stationstatus.name == subq.c.name) &
+        (Stationstatus.updatetime == subq.c.max_time)
+    ).all()
+
+    status_list = []
+    for s in latest:
+        status_list.append({
+            "name": s.name,
+            "status": "abnormal" if s.status else "normal",
+            "statusinfo": s.statusinfo or "",
+            "errortime": s.errortime or "",
+            "message": s.statusinfo or "",
+            "abnormaltime": s.errortime or "",
+        })
+    return {"status": status_list}
 
 
 @app.get("/ranking")
-def getranking():
-    station = read_json(BASE_DIR / "data" / "stations.json")
-    return station["stations"]
+def getranking(db: Session = Depends(get_db)):
+    station_dict = []
+    for station in db.query(Stationinfo).all():
+        station_dict.append({
+            "name": station.name,
+            "flow": station.flow
+        })
+    return station_dict
 
 
 @app.get("/stationPoint")
-def getstationPoint():
-    return read_json(BASE_DIR / "data" / "GZLine1_Station.geojson")
+def getstationPoint(db: Session = Depends(get_db)):
+    station_dict = []
+    for station in db.query(Station).all():
+        station_dict.append({
+            "name": station.name,
+            "longitude": station.longitude,
+            "latitude": station.latitude
+        })
+    return {"geometries": station_dict}
 
 
 @app.get("/line")
